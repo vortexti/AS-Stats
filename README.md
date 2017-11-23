@@ -17,7 +17,7 @@ GNU General Public License v2.0
 
 ###### Dashboard
 
-![alt text](https://github.com/openbsod/AS-Stats/blob/master/images/as-stats.png)
+![alt text](https://github.com/openbsod/AS-Stats/blob/master/as-stats.png)
 
 
 How it works
