@@ -1,2 +1,0 @@
-perl asstatd.pl -r /home/data/as-stats/rrd -p 9996 -P 6343 -k /home/data/as-stats/conf/knownlinks -a 44050 -n -m /etc/perl/ip2asn.json
-

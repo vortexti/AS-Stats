@@ -1,3 +1,0 @@
-RRD_DIR=/tmp
-CONF_FILE=/etc/as-stats/netflow-links
-EXTRA_ARGS=""
