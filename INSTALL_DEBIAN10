@@ -1,0 +1,200 @@
+INSTALAÇÃO
+
+Ajustes o respositório: non-free + contrib
+
+# vim /etc/apt/sources.list
+
+deb http://deb.debian.org/debian/ buster main non-free contrib
+deb-src http://deb.debian.org/debian/ buster main non-free contrib
+
+deb http://security.debian.org/debian-security buster/updates main non-free contrib
+deb-src http://security.debian.org/debian-security buster/updates main non-free contrib
+
+# buster-updates, previously known as 'volatile'
+deb http://deb.debian.org/debian/ buster-updates main non-free contrib
+deb-src http://deb.debian.org/debian/ buster-updates main non-free contrib
+
+Pacotes necessários
+# apt install \
+  unzip wget git net-tools curl dnsutils whois build-essential \
+  perl libnet-patricia-perl libjson-xs-perl netcat python3-requests \
+  libdbd-sqlite3-perl libtrycatch-perl rrdtool-tcl libgd-graph-perl \
+  librrds-perl librrdp-perl librrdtool-oo-perl \
+  rrdtool rrdtool-dbg librrd-dev rrdcollect \
+  apache2 libapache2-mod-php php php-sqlite3 \
+  php-cli php-gmp php-gd php-bcmath php-mbstring \
+  php-pear php-curl php-xml php-zip libyaml-perl 
+
+
+# perl -MCPAN -e 'install Net::sFlow'
+# perl -MCPAN -e 'install File::Find::Rule'
+
+
+
+Pesquisa adicional 
+# cp /data/asstats/ip2asn/ip2as.pm /usr/share/perl5/
+
+
+Instale o snmpwalk e as mibs
+# apt install snmp snmp-mibs-downloader
+# cp  /etc/snmp/snmp.conf   /etc/snmp/snmp.conf.old
+# echo "" > /etc/snmp/snmp.conf
+
+Identifique
+
+# snmpwalk -v2c -c public 10.20.30.2 ifDescr
+IF-MIB::ifDescr.1 = STRING: sfp-sfpplus1
+IF-MIB::ifDescr.2 = STRING: sfp-sfpplus2
+IF-MIB::ifDescr.3 = STRING: ether1
+IF-MIB::ifDescr.4 = STRING: ether2
+IF-MIB::ifDescr.5 = STRING: ether3
+IF-MIB::ifDescr.6 = STRING: ether4
+IF-MIB::ifDescr.7 = STRING: ether5
+IF-MIB::ifDescr.8 = STRING: ether6
+IF-MIB::ifDescr.9 = STRING: ether7
+IF-MIB::ifDescr.10 = STRING: ether8
+IF-MIB::ifDescr.11 = STRING: IX-SP-IPv4.10
+IF-MIB::ifDescr.12 = STRING: IX-SP-IPv6.11
+IF-MIB::ifDescr.13 = STRING: IX-PR-IPv6.20
+IF-MIB::ifDescr.14 = STRING: IX-PR-IPv4.21
+IF-MIB::ifDescr.15 = STRING: IX-RS-IPv4.30
+IF-MIB::ifDescr.16 = STRING: IX-RS-IPv6.31
+
+# snmpwalk -v2c -c public 10.20.30.2 ifIndex
+IF-MIB::ifIndex.1 = INTEGER: 1
+IF-MIB::ifIndex.2 = INTEGER: 2
+IF-MIB::ifIndex.3 = INTEGER: 3
+IF-MIB::ifIndex.4 = INTEGER: 4
+IF-MIB::ifIndex.5 = INTEGER: 5
+IF-MIB::ifIndex.6 = INTEGER: 6
+IF-MIB::ifIndex.7 = INTEGER: 7
+IF-MIB::ifIndex.8 = INTEGER: 8
+IF-MIB::ifIndex.9 = INTEGER: 9
+IF-MIB::ifIndex.10 = INTEGER: 10
+IF-MIB::ifIndex.11 = INTEGER: 11
+IF-MIB::ifIndex.13 = INTEGER: 13
+IF-MIB::ifIndex.14 = INTEGER: 14
+IF-MIB::ifIndex.15 = INTEGER: 15
+IF-MIB::ifIndex.16 = INTEGER: 16
+
+
+Ajustes as entradas
+
+# vim /data/asstats/conf/knownlinks
+
+# Router IP             SNMP ifindex[/VLAN]     tag                             description             color   samplingrate
+#192.0.2.1		15				uplink1			Uplink 1		A6CEE3	1
+#192.0.2.1		23				uplink2			Uplink 2		1F78B4	1
+#192.0.2.2		42				peering1		IXP 1			FB9A99	1
+#192.0.2.2		45				peering2		IXP 2			E31A1C	1
+#192.0.2.3		6				peering3		IXP 3			FDBF6F	2048
+10.20.30.2		11				vlan10			IX.SP		F44336	1
+10.20.30.2		15				vlan30			IX.RS		CDDC39	1
+10.20.30.2		13				vlan20			IX.PR		4CAF50	1
+10.20.30.2		1					sfpplus1			AS1234		009688	1
+
+
+Ajuste seu AS 
+# vim /data/asstats/bin/start
+
+
+Inicie
+/data/asstats/bin/start
+
+
+Verifique se as portas estão ouvindo
+# netstat -putan  |grep perl
+udp        0      0 0.0.0.0:9996            0.0.0.0:*                           1261/perl           
+udp        0      0 0.0.0.0:6343            0.0.0.0:*                           1261/perl  
+
+
+Carregar na inicialização
+# ln -s /lib/systemd/system/rc-local.service /etc/systemd/system/rc-local.service
+# vim /etc/rc.local
+
+#!/bin/bash
+/data/asstats/bin/start
+exit 0
+
+
+Ajuste o cron
+
+
+# crontab -e
+# 5min
+*/5 * * * * perl /data/asstats/bin/rrd-extractstats.pl /data/asstats/rrd /data/asstats/conf/knownlinks /data/asstats/asstats/asstats_day.txt
+
+# 7 Dias
+#0 0 * * 0 perl /data/asstats/bin/rrd-extractstats.pl /data/asstats/rrd /data/asstats/conf/knownlinks /data/asstats/asstats/asstats_week.txt 168
+
+# 30 dias 
+#0 0 1 * * perl /data/asstats/bin/rrd-extractstats.pl /data/asstats/rrd /data/asstats/conf/knownlinks /data/asstats/asstats/asstats_month.txt 720
+
+
+# systemctl restart cron.service
+
+
+Instale o tcpdump para verificar se os pacotes estão sendo enviado
+# apt install tcpdump
+# tcpdump -i enp0s3 -n udp port 9996 -T cnfp
+
+
+Agora faça a configuração do seu router para enviar os flows:
+
+
+Ex: Mikrotik
+
+
+/ip traffic-flow
+set active-flow-timeout=5m cache-entries=16k enabled=yes interfaces=INTERFACES
+
+/ip traffic-flow ipfix
+set dst-address-mask=no dst-mac-address=no first-forwarded=no gateway=no icmp-code=no icmp-type=no igmp-type=no ip-header-length=no ip-total-length=no ipv6-flow-label=no is-multicast=no last-forwarded=no \
+    nat-dst-address=no nat-dst-port=no nat-src-address=no nat-src-port=no src-address-mask=no src-mac-address=no tcp-ack-num=no tcp-flags=no tcp-seq-num=no tcp-window-size=no tos=no ttl=no udp-length=no
+
+/ip traffic-flow target
+add dst-address=IP_SERVER_ASSTATS port=9996 src-address=IP_ORIGEM version=5
+
+
+Aguarde ~1-5 min até gerar os arquivos em /data/asstats/rrd
+
+
+Monitore a saude do seu servidor 
+# apt install htop iotop
+htop
+iotop
+
+
+
+Ajuste o apache  para fazer acesso
+
+# sed -i 's/ServerTokens OS/ServerTokens Prod/' /etc/apache2/conf-available/security.conf
+# sed -i 's/ServerSignature On/ServerSignature Off/' /etc/apache2/conf-available/security.conf
+# vim /etc/apache2/sites-available/asstats.conf
+
+<virtualhost *:80>
+   ServerName asstats.remontti.com.br
+   ServerAdmin noc@remontti.com.br
+ 
+   DocumentRoot /data/asstats/www
+ 
+   ErrorDocument 403 http://www.remontti.com.br
+ 
+   <Directory /data/asstats/www/>
+      Options FollowSymLinks
+      AllowOverride All
+      Require all denied
+      <RequireAll>
+         <RequireAny>
+            Require ip 192.168.0.0/24 2804:1234:bebe::/48
+         </RequireAny>
+      </RequireAll>
+   </Directory>
+ 
+   ErrorLog ${APACHE_LOG_DIR}/error_asstats.log
+   CustomLog ${APACHE_LOG_DIR}/access_asstats.log combined
+ 
+</VirtualHost>
+
+# a2ensite asstats.conf
+# systemctl restart apache2

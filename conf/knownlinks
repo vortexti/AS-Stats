@@ -1,0 +1,10 @@
+# Router IP             SNMP ifindex[/VLAN]     tag                             description             color   samplingrate
+# nota: tabulações devem ser usadas para separar campos (não espaços)
+# máx. o comprimento da tag é de 12 caracteres; caracteres permitidos: a-z A-Z 0-9 _
+# sampling: taxa de amostragem pode ser separada para entrada / saída especificando taxas <in> / <out>.
+# snmpwalk -v2c -c public 10.20.30.2 ifDescr
+# snmpwalk -v2c -c public 10.20.30.2 ifIndex
+10.20.30.2		11				vlan10			IX.SP		F44336	1
+10.20.30.2		15				vlan30			IX.RS		CDDC39	1
+10.20.30.2		13				vlan20			IX.PR		4CAF50	1
+10.20.30.2		1					sfpplus1			AS1234		009688	1
