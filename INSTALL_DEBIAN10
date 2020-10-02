@@ -29,7 +29,10 @@ Pacotes necessários
 # perl -MCPAN -e 'install Net::sFlow'
 # perl -MCPAN -e 'install File::Find::Rule'
 
-
+Baixar projeto
+# mkdir /data/
+# cd /data/
+# git clone https://github.com/remontti/AS-Stats.git asstats
 
 Pesquisa adicional 
 # cp /data/asstats/ip2asn/ip2as.pm /usr/share/perl5/
@@ -97,10 +100,8 @@ Ajustes as entradas
 Ajuste seu AS 
 # vim /data/asstats/bin/start
 
-
 Inicie
 /data/asstats/bin/start
-
 
 Verifique se as portas estão ouvindo
 # netstat -putan  |grep perl
@@ -119,7 +120,6 @@ exit 0
 
 Ajuste o cron
 
-
 # crontab -e
 # 5min
 */5 * * * * perl /data/asstats/bin/rrd-extractstats.pl /data/asstats/rrd /data/asstats/conf/knownlinks /data/asstats/asstats/asstats_day.txt
@@ -130,21 +130,15 @@ Ajuste o cron
 # 30 dias 
 #0 0 1 * * perl /data/asstats/bin/rrd-extractstats.pl /data/asstats/rrd /data/asstats/conf/knownlinks /data/asstats/asstats/asstats_month.txt 720
 
-
 # systemctl restart cron.service
-
 
 Instale o tcpdump para verificar se os pacotes estão sendo enviado
 # apt install tcpdump
 # tcpdump -i enp0s3 -n udp port 9996 -T cnfp
 
-
 Agora faça a configuração do seu router para enviar os flows:
 
-
 Ex: Mikrotik
-
-
 /ip traffic-flow
 set active-flow-timeout=5m cache-entries=16k enabled=yes interfaces=INTERFACES
 
@@ -155,7 +149,6 @@ set dst-address-mask=no dst-mac-address=no first-forwarded=no gateway=no icmp-co
 /ip traffic-flow target
 add dst-address=IP_SERVER_ASSTATS port=9996 src-address=IP_ORIGEM version=5
 
-
 Aguarde ~1-5 min até gerar os arquivos em /data/asstats/rrd
 
 
@@ -163,8 +156,6 @@ Monitore a saude do seu servidor
 # apt install htop iotop
 htop
 iotop
-
-
 
 Ajuste o apache  para fazer acesso
 
