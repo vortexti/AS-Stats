@@ -8,10 +8,10 @@ DIRRRD='/data/asstats/rrd'
 KNOWNLINKS='/data/asstats/conf/knownlinks'
 IP2ASN='/data/asstats/ip2asn/ip2asn.json'
 
-# ---- SAMPLES ---- #
-# 
 # -p = Port netflow / -P port sflow
-# perl ${ASSTATD} -r ${DIRRRD}  -p 9996 -P 6343 -k ${KNOWNLINKS} -a ${MEUAS}
+# 
+# netflow/sflow - (Huawei NE, Cisco, JunOS...)
+# perl ${ASSTATD} -r ${DIRRRD}  -p 9996 -P 6343 -k ${KNOWNLINKS} -a ${MEUAS} &
 
-# RoutesOS - Flow v5
+# Flow v5 - (RoutesOS/Mikrotik)
 perl ${ASSTATD} -r ${DIRRRD} -k ${KNOWNLINKS} -a ${MEUAS} -n -m ${IP2ASN} &
