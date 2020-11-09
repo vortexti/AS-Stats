@@ -15,6 +15,11 @@ Apache License 2.0
 GNU General Public License v2.0
 
 
+#### Installation / Instalação 🇧🇷
+
+[Como obter gráficos de tráfego por AS utilizando AS-STATS](https://blog.remontti.com.br/5129)
+
+
 ###### Dashboard
 
 ![alt text](https://github.com/openbsod/AS-Stats/blob/master/as-stats.png)
